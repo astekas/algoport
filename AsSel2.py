@@ -91,9 +91,21 @@ class DEA_AS(AssetPreselector):
         :param config: dict, DEA-specific settings
         :return: list of str, selected asset names
         '''
-        dea = rpackages.importr('additiveDEA')
-        pandas2ri.activate()
 
+        # Check if additiveDEA package is available. Otherwise - attempt installing.
+        try:
+            dea = rpackages.importr('additiveDEA')
+        except:
+            print('Failed to import additiveDEA R package. Trying to install.')
+            try:
+                utils = rpackages.importr('utils')
+                utils.chooseCRANmirror(ind=1)
+                utils.install_packages('additiveDEA')
+                dea = rpackages.importr('additiveDEA')
+            except Exception as e:
+                raise ValueError(f'Failed to install the additiveDEA R package. Exception - {e}. Please, make sure that there is R installed with additiveDEA package in it.')
+
+        pandas2ri.activate()
         data = outputs.join(inputs)
         n_outputs = len(outputs.columns)
 

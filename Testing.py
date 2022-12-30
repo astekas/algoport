@@ -7,18 +7,7 @@ def parse(path):
     df = pickle.load(f)
     return df
 
-strategy = StrategyConfigured(name='MSG_Pearson_ratio', preselection=False).fetch()
-
-test = BackTest(strategy=strategy,
-                period_start="2016-01-01",
-                period_end="2017-01-01",
-                preselection_profile=parse('.\\Tests\\Growth\\Preselection_DEA.pkl'),
-                train_periods=1825,
-                output_path=f'.\\Tests\\Growth\\MSG_Pearson_ratio')
-
-test.run()
-
-to_test = ['MSG_Sharpe_ratio', 'MSG_Omega_ratio', 'MSG_Stable_ratio',
+to_test = ['MSG_Sharpe_ratio', 'MSG_Stable_ratio',
            'MSG_Sharpe_ratio_cond', 'MSG_Sharpe_ratio_ranking', 'MSG_Sharpe_ratio_R1', 'MSG_Sharpe_ratio_R2']
 
 for name in to_test:

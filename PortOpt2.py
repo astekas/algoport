@@ -297,13 +297,13 @@ class SimplexOptimization(PortfolioOptimizer):
                 return res
         n_assets = len(returns)
         x_i = np.ones(n_assets) / n_assets
-        # x_i = x_i / x_i.sum()
+
         val_i = func(x_i)
-        x, value, improved = self.improve_by_increasing(x=x_i, value=val_i, func=func, n_assets=n_assets, tol=tol, prec=prec, m=m, p=p)
+        x, value, improved = self.improve_by_increasing(x=x_i, value=val_i, func=func, n_assets=n_assets, tol=tol, m=m, p=p)
         while improved:
-            x, value, improved = self.improve_by_decreasing(x=x, value=value, func=func, n_assets=n_assets, tol=tol, prec=prec, m=m, p=p)
+            x, value, improved = self.improve_by_decreasing(x=x, value=value, func=func, n_assets=n_assets, tol=tol, m=m, p=p)
             if improved:
-                x, value, improved = self.improve_by_increasing(x=x, value=value, func=func, n_assets=n_assets, tol=tol, prec=prec, m=m,
+                x, value, improved = self.improve_by_increasing(x=x, value=value, func=func, n_assets=n_assets, tol=tol, m=m,
                                                                 p=p)
         print(x, value)
         return self.repair(x, precision=prec), value
