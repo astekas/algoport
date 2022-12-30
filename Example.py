@@ -25,14 +25,14 @@ def parse(path):
 # and kwargs passeed to the fit function
 # preselector_kwargs - kwargs passed to the "preselection" customizable function in preselector. Thus depend on the
 # specific preselector used.
-# preselector = Ranking_AS(model=MarkovChainProcess,
-#                          metrics=[(cumulative_wealth, True, {'T': 50})],
-#                          model_metrics=[('MSG_time_to_gain', False, {'T': 10, 'thresh': 1.04})],
-#                          model_kwargs={'init': {},
-#                                         'fit': {'N': 9,
-#                                                 }},
-#                          preselector_kwargs={'kind': 'Fixed',
-#                                               'n_assets': 30})
+preselector = Ranking_AS(model=MarkovChainProcess,
+                         metrics=[(cumulative_wealth, True, {'T': 50})],
+                         model_metrics=[('MSG_time_to_gain', False, {'T': 10, 'thresh': 1.04})],
+                         model_kwargs={'init': {},
+                                        'fit': {'N': 9,
+                                                }},
+                         preselector_kwargs={'kind': 'Fixed',
+                                              'n_assets': 30})
 
 # Initialize optimizer. Logic is similar to preselector, just note that only a single metric is supported at the moment,
 # so a single metric tuple should be passed to either metric or model_metric argument
@@ -48,7 +48,7 @@ optimizer = SimplexOptimization(model=MarkovChainProcess,
 # Initialize the strategy by passing preselector, optimizer and regulation_kwargs, which are passed to the
 # customizable regulation function within strategy class. Regulation is being called on each time step except the first,
 # thus user can define the strategy in time.
-strategy = StrategySmoothed(preselector=None,
+strategy = StrategySmoothed(preselector=preselector,
                             optimizer=optimizer,
                             regulation_kwargs={'redistribute_every': 5, 'smoothing_delta': 0.5})
 
@@ -68,7 +68,6 @@ strategy = StrategySmoothed(preselector=None,
 test = BackTest(strategy=strategy,
                 period_start="2021-12-09",
                 period_end="2021-12-17",
-                preselection_profile=parse('.\\Tests\\Recession\\Preselection_DEA.pkl'),
                 train_periods=1825,
                 output_path='.\\Tests\\Test\\')
 

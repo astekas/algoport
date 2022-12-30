@@ -3,8 +3,15 @@ import inspect
 import pandas as pd
 import Metrics
 import numpy as np
-import rpy2.robjects.packages as rpackages
-from rpy2.robjects import pandas2ri
+import warnings
+try:
+    import rpy2.robjects.packages as rpackages
+    from rpy2.robjects import pandas2ri
+    rpy2_imported = True
+except:
+    warnings.warn('Failed to import rpy2. Perhaps, R installation is missing or could not be found. DEA preselector is anavailable.'
+                  'Consider installing R.')
+    rpy2_imported = False
 
 class AssetPreselector():
     def __init__(self, model=None, metrics=None, model_metrics=None, model_kwargs=None, preselector_kwargs=None, config=None):
@@ -91,6 +98,9 @@ class DEA_AS(AssetPreselector):
         :param config: dict, DEA-specific settings
         :return: list of str, selected asset names
         '''
+
+        if not rpy2_imported:
+            raise ValueError('DEA_AS preselector requires R installation, which was not found! Consider using Ranking_AS preselector.')
 
         # Check if additiveDEA package is available. Otherwise - attempt installing.
         try:

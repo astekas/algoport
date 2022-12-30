@@ -1,9 +1,17 @@
 from Strategy2 import *
-from AGC import GARCH_EVT_COPULA
 from Markov import MarkovChainProcess
 from PortOpt2 import *
 from AsSel2 import *
 from Metrics import *
+import warnings
+
+try:
+    from AGC import GARCH_EVT_COPULA
+    agc_imported = True
+except:
+    warnings.warn('Missing dependencies for Arma-Garch-Copula model. AGC strategy is unavailable. '
+                  'Consider installing copulas and arch packages.')
+    agc_imported = False
 
 class StrategyConfigured:
 

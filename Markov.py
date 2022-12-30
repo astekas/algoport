@@ -6,7 +6,16 @@ from scipy.stats import levy_stable
 from itertools import product
 import pandas as pd
 import pickle
-import cdf_2
+import warnings
+
+try:
+    import cdf_2
+    cdf_2_imported = True
+except:
+    cdf_2_imported = False
+    warnings.warn('Could not import the C version of integrand for stable CDF. '
+                  'This will result in slowed down performance for Omega Ratio. '
+                  'Currently the C version is only prebuilt for Python 3.8 environment.')
 
 class MarkovChainProcess:
     def __init__(self):
@@ -695,7 +704,11 @@ class MarkovChainProcess:
         if loc > thresh:
             thresh = (loc + thresh) / 2
 
-        OR = self.omega_ratio_c(thresh, alpha, beta, loc, scale)
+        # The check is done on import. Use C version if managed to import the dll or Python if not.
+        if cdf_2_imported:
+            OR = self.omega_ratio_c(thresh, alpha, beta, loc, scale)
+        else:
+            OR = self.omega_ratio(thresh, alpha, beta, loc, scale)
         return OR
 
     def MSG_stable_ratio(self, T):
