@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 from scipy.signal import find_peaks
 import pickle
 
-from Data import Dataset
+from Algoport.Data import Dataset
 from Utilities import *
 
 

@@ -8,7 +8,7 @@ setup(
     author='Anton Sauchanka',
     author_email='anton.sauchanka@gmail.com',
     license='BSD 2-clause',
-    packages=['algoport'],
+    packages=['Algoport'],
     install_requires=['matplotlib==3.6.1',
                      'mealpy==2.5.1',
                       'numpy==1.23.3',

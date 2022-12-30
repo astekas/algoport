@@ -9,7 +9,6 @@ import numpy as np
 from scipy.sparse import csc_matrix
 from scipy.optimize import minimize as sc_minimize
 from scipy.optimize import LinearConstraint as LC
-from Markov import MarkovChainProcess
 import Metrics
 from time import perf_counter
 from mealpy.bio_based import SMA
