@@ -1,9 +1,9 @@
-from Strategy2 import *
-from Markov import MarkovChainProcess
-from PortOpt2 import SimplexOptimization
-from AsSel2 import Ranking_AS
-from Backtesting2 import BackTest
-from Metrics import cumulative_wealth
+from Algoport.Strategy2 import *
+from Algoport.Markov import MarkovChainProcess
+from Algoport.PortOpt2 import SimplexOptimization
+from Algoport.AsSel2 import Ranking_AS
+from Algoport.Backtesting2 import BackTest
+from Algoport.Metrics import cumulative_wealth
 import pickle
 
 # Just a custom function to parse the preselection profiles.

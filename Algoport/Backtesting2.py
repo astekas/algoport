@@ -6,7 +6,7 @@ from scipy.signal import find_peaks
 import pickle
 
 from Algoport.Data import Dataset
-from Utilities import *
+from Algoport.Utilities import *
 
 
 class BackTest:

@@ -1,8 +1,7 @@
-from PortOpt2 import SciPy, MVOptimization, SimplexOptimization
+from Algoport.PortOpt2 import SimplexOptimization
 import numpy as np
 import pandas as pd
-from Markov import MarkovChainProcess
-from AGC import GARCH_EVT_COPULA
+from Algoport.Markov import MarkovChainProcess
 
 # Create a test input as pd.DataFrame returns.
 np.random.seed(1)

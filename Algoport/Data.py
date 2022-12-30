@@ -1,5 +1,4 @@
 import pandas as pd
-import pickle
 
 class Dataset:
     def __init__(self, name):

@@ -1,9 +1,10 @@
-from Strategy2 import *
-from Markov import MarkovChainProcess
-from PortOpt2 import *
-from AsSel2 import *
-from Metrics import *
 import warnings
+
+from Algoport.Strategy2 import *
+from Algoport.Markov import MarkovChainProcess
+from Algoport.PortOpt2 import *
+from Algoport.AsSel2 import *
+from Algoport.Metrics import *
 
 try:
     from AGC import GARCH_EVT_COPULA

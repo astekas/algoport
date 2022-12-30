@@ -9,7 +9,7 @@ import pickle
 import warnings
 
 try:
-    import cdf_2
+    from Algoport import cdf_2
     cdf_2_imported = True
 except:
     cdf_2_imported = False

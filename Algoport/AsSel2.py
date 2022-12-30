@@ -1,9 +1,11 @@
 ### A module containing the models for Asset Preselection ###
 import inspect
 import pandas as pd
-import Metrics
 import numpy as np
 import warnings
+
+from Algoport import Metrics
+
 try:
     import rpy2.robjects.packages as rpackages
     from rpy2.robjects import pandas2ri

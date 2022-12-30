@@ -1,7 +1,7 @@
 ### A module containing the end-to-end portfolio management strategies ###
-import Utilities as U
 import numpy as np
 
+from Algoport import Utilities as U
 
 class Strategy:
     def __init__(self, config=None, preselector=None, optimizer=None, transaction_cost=0, regulation_kwargs=None):

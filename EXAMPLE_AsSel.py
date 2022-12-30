@@ -1,8 +1,8 @@
-from Markov import MarkovChainProcess
+from Algoport.Markov import MarkovChainProcess
 import numpy as np
 import pandas as pd
-from AsSel2 import Ranking_AS
-from Metrics import cumulative_wealth
+from Algoport.AsSel2 import Ranking_AS
+from Algoport.Metrics import cumulative_wealth
 
 # Create a test input as pd.DataFrame returns.
 arr = []
