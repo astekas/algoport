@@ -9,6 +9,7 @@ setup(
     author_email='anton.sauchanka@gmail.com',
     license='BSD 2-clause',
     packages=['Algoport'],
+    include_package_data=True,
     install_requires=['matplotlib==3.6.1',
                       'mealpy==2.5.1',
                       'numpy==1.23.3',
