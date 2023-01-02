@@ -17,18 +17,26 @@ except:
 class StrategyConfigured:
 
     def __init__(self, name, T=5, preselection=True):
-        self.available = ['MSG_Sharpe_ratio', 'MSG_Pearson_ratio', 'MSG_Omega_ratio', 'MSG_Stable_ratio',
-                          'MSG_Sharpe_ratio_cond', 'MSG_Sharpe_ratio_ranking', 'MSG_Sharpe_ratio_R1', 'MSG_Sharpe_ratio_R2',
-                          'AGC_Sharpe_ratio', 'AGC_MVO']
+        self.available = self.list()
 
         if name in self.available:
             self.name = name
         else:
             raise ValueError(f'Unknown strategy name. Available - {self.available}')
 
+        if 'AGC' in self.name and not agc_imported:
+            raise ValueError(f'{self.name} strategy is unavailable since requirements for AGC are not satisfied. Install copulas and arch packages and try again. ')
+
         self.T = T
 
         self.preselection = preselection
+
+    @staticmethod
+    def list():
+        l = ['MSG_Sharpe_ratio', 'MSG_Pearson_ratio', 'MSG_Omega_ratio', 'MSG_Stable_ratio',
+             'MSG_Sharpe_ratio_cond', 'MSG_Sharpe_ratio_ranking', 'MSG_Sharpe_ratio_R1', 'MSG_Sharpe_ratio_R2',
+             'AGC_Sharpe_ratio', 'AGC_MVO']
+        return l
 
     def prepare_preselector(self):
         if self.preselection:
