@@ -1,4 +1,8 @@
 import pandas as pd
+from pkg_resources import resource_filename
+
+data_path = resource_filename('Algoport', 'Data/')
+
 
 class Dataset:
     def __init__(self, name):
@@ -9,7 +13,7 @@ class Dataset:
             self.name = name
 
     def SNP500(self, start, end):
-        df = pd.read_parquet("Data/S&P/sp500_stocks.parquet")
+        df = pd.read_parquet(data_path + "S&P/sp500_stocks.parquet")
         df = df.pivot_table(index='Symbol', columns='Date', values='Close')
         df = df.loc[:, start:end]
         df = df.rolling(2, axis=1).apply(lambda x: x.iloc[1] / x.iloc[0]).iloc[:, 1:]
