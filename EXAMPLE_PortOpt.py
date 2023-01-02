@@ -1,4 +1,4 @@
-from Algoport.PortOpt2 import SimplexOptimization
+from Algoport.PortfolioOptimization import SimplexOptimization
 import numpy as np
 import pandas as pd
 from Algoport.Markov import MarkovChainProcess

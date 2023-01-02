@@ -1,8 +1,8 @@
-from Algoport.Strategy2 import *
+from Algoport.Strategy import *
 from Algoport.Markov import MarkovChainProcess
-from Algoport.PortOpt2 import SimplexOptimization
-from Algoport.AsSel2 import Ranking_AS
-from Algoport.Backtesting2 import BackTest
+from Algoport.PortfolioOptimization import SimplexOptimization
+from Algoport.AssetSelection import Ranking_AS
+from Algoport.Backtesting import BackTest
 from Algoport.Metrics import cumulative_wealth
 import pickle
 

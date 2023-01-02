@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='algoport',
-    version='0.1.0',
+    version='0.1.1',
     description='Algorithmic portfolio management framework',
     url='https://github.com/astekas/algoport.git',
     author='Anton Sauchanka',
@@ -10,7 +10,7 @@ setup(
     license='BSD 2-clause',
     packages=['Algoport'],
     install_requires=['matplotlib==3.6.1',
-                     'mealpy==2.5.1',
+                      'mealpy==2.5.1',
                       'numpy==1.23.3',
                       'pandas==1.4.4',
                       'plotly==5.9.0',

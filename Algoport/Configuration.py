@@ -1,9 +1,9 @@
 import warnings
 
-from Algoport.Strategy2 import *
+from Algoport.Strategy import *
 from Algoport.Markov import MarkovChainProcess
-from Algoport.PortOpt2 import *
-from Algoport.AsSel2 import *
+from Algoport.PortfolioOptimization import *
+from Algoport.AssetSelection import *
 from Algoport.Metrics import *
 
 try:

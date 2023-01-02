@@ -1,5 +1,6 @@
-from Backtesting2 import BackTest
 import pickle
+
+from Algoport.Backtesting import BackTest
 from Configuration import StrategyConfigured
 
 def parse(path):
