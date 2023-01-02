@@ -1,1 +1,1 @@
-recursive-include Algoport/Data/*.parquet
+include Algoport/Data/*.parquet
