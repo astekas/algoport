@@ -3,9 +3,9 @@ Proof-of-concept implementation of the generalized algorithmic portfolio managem
 
 ## Installation
 Install through pip using the following command:
-'''
+```
 pip install git+https://github.com/astekas/algoport.git
-'''
+```
 
 ## Requirements 
 Note that current version of this package is very dependency-heavy. 
