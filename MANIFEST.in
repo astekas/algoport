@@ -1,1 +1,2 @@
 include Algoport/Data/*.parquet
+include Algoport/*.pyd
