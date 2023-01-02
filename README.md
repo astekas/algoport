@@ -1,6 +1,11 @@
 # ALGOPORT (alpha version)
 Proof-of-concept implementation of the generalized algorithmic portfolio management framework. The development is in extremely early stage and thus this implementation might be unstable. 
 
+## Installation
+Install through pip using the following command:
+```
+pip install git+https://github.com/astekas/algoport.git
+```
 
 ## Requirements 
 Note that current version of this package is very dependency-heavy. 
