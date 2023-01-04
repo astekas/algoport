@@ -1,7 +1,7 @@
 from Algoport.Strategy import *
 from Algoport.Markov import MarkovChainProcess
 from Algoport.PortfolioOptimization import SimplexOptimization
-from Algoport.AssetSelection import Ranking_AS
+from Algoport.AssetSelection import *
 from Algoport.Backtesting import BackTest
 from Algoport.Metrics import cumulative_wealth
 import pickle
@@ -25,14 +25,17 @@ def parse(path):
 # and kwargs passeed to the fit function
 # preselector_kwargs - kwargs passed to the "preselection" customizable function in preselector. Thus depend on the
 # specific preselector used.
-preselector = Ranking_AS(model=MarkovChainProcess,
-                         metrics=[(cumulative_wealth, True, {'T': 50})],
-                         model_metrics=[('MSG_time_to_gain', False, {'T': 10, 'thresh': 1.04})],
-                         model_kwargs={'init': {},
-                                        'fit': {'N': 9,
-                                                }},
-                         preselector_kwargs={'kind': 'Fixed',
-                                              'n_assets': 30})
+
+# preselector = Ranking_AS(model=MarkovChainProcess,
+#                          metrics=[(cumulative_wealth, True, {'T': 50})],
+#                          model_metrics=[('MSG_time_to_gain', False, {'T': 10, 'thresh': 1.04})],
+#                          model_kwargs={'init': {},
+#                                         'fit': {'N': 9,
+#                                                 }},
+#                          preselector_kwargs={'kind': 'Fixed',
+#                                               'n_assets': 30})
+
+preselector = ComponentsPreselector(preselector_kwargs={'kind':'robust', 'n_components':3, 'variance_explained':None})
 
 # Initialize optimizer. Logic is similar to preselector, just note that only a single metric is supported at the moment,
 # so a single metric tuple should be passed to either metric or model_metric argument
@@ -67,7 +70,7 @@ strategy = StrategySmoothed(preselector=preselector,
 # Output path - path to folder where results are saved.
 test = BackTest(strategy=strategy,
                 period_start="2021-12-09",
-                period_end="2021-12-17",
+                period_end="2021-12-15",
                 train_periods=1825,
                 output_path='.\\Tests\\Test\\')
 

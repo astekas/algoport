@@ -75,17 +75,22 @@ class Strategy:
         self.wealth[-1] = self.wealth[-1] - share_sold * self.transaction_cost
 
     def regulation(self, returns, assets=None, redistribute_every=1, maintain_weights=False, **kwargs):
+        if assets is None:
+            assets = np.array(returns.index)
+
         if self.step % redistribute_every == 0:
             if self.preselector is not None:
-                assets = self.preselector.select(returns=returns)
-                returns = returns.loc[assets]
+                returns = self.preselector.select(returns=returns)
+                if self.preselector.kind == 'Assets':
+                    assets = np.array(returns.index)
             elif assets is not None:
                 returns = returns.loc[assets]
-            else:
-                assets = np.array(returns.index)
+
             if self.optimizer is not None:
                 current_weights = self.weights_current.loc[returns.index]
                 weights = self.optimizer.optimize(returns=returns, current_weights=current_weights)
+                if self.preselector.kind == 'Components':
+                    weights = self.preselector.reverse_transform(weights)
             else:
                 weights = np.ones(len(returns))
                 weights = weights / weights.sum()
@@ -100,16 +105,20 @@ class Strategy:
 
     def evaluate(self, returns, assets=None):
         print(f'Evaluation step - {self.step}')
+        if assets is None:
+            assets = np.array(returns.index)
+
         if self.step == 0:
             if self.preselector is not None:
-                assets = self.preselector.select(returns=returns)
-                returns = returns.loc[assets]
+                returns = self.preselector.select(returns=returns)
+                if self.preselector.kind == 'Assets':
+                    assets = np.array(returns.index)
             elif assets is not None:
                 returns = returns.loc[assets]
-            else:
-                assets = np.array(returns.index)
             if self.optimizer is not None:
                 weights = self.optimizer.optimize(returns=returns)
+                if self.preselector.kind == 'Components':
+                    weights = self.preselector.reverse_transform(weights)
             else:
                 weights = np.ones(len(returns))
                 weights = weights / weights.sum()
@@ -123,17 +132,22 @@ class Strategy:
 
 class StrategySmoothed(Strategy):
     def regulation(self, returns, assets=None, redistribute_every=1, smoothing_delta=0.5, **kwargs):
+        if assets is None:
+            assets = np.array(returns.index)
+
         if self.step % redistribute_every == 0:
             if self.preselector is not None:
-                assets = self.preselector.select(returns=returns)
-                returns = returns.loc[assets]
+                returns = self.preselector.select(returns=returns)
+                if self.preselector.kind == 'Assets':
+                    assets = np.array(returns.index)
             elif assets is not None:
                 returns = returns.loc[assets]
-            else:
-                assets = np.array(returns.index)
+
             if self.optimizer is not None:
                 current_weights = self.weights_current.loc[returns.index]
                 weights = self.optimizer.optimize(returns=returns, current_weights=current_weights)
+                if self.preselector.kind == 'Components':
+                    weights = self.preselector.reverse_transform(weights)
             else:
                 weights = np.ones(len(returns))
                 weights = weights / weights.sum()

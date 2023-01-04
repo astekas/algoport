@@ -4,9 +4,11 @@ numpy==1.23.3
 pandas==1.4.4
 plotly==5.9.0
 pymoo==0.6.0
-qpsolvers[open_source_solvers]
+qpsolvers[open_source_solvers]~=2.3.0
 rpy2==3.5.5
 scipy==1.9.3
 statsmodels==0.13.2
 Cython==0.29.32
 pyarrow==10.0.1
+scikit-learn~=1.2.0
+setuptools~=60.2.0

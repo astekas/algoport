@@ -1,8 +1,11 @@
 ### A module containing the models for Asset Preselection ###
 import inspect
+
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import warnings
+from sklearn.decomposition import PCA, SparsePCA
 
 from Algoport import Metrics
 
@@ -15,6 +18,8 @@ except:
                   'Consider installing R.')
     rpy2_imported = False
 
+
+# A parent class for reduction type preselection algorithms
 class AssetPreselector():
     def __init__(self, model=None, metrics=None, model_metrics=None, model_kwargs=None, preselector_kwargs=None, config=None):
         '''
@@ -36,6 +41,7 @@ class AssetPreselector():
         self.model_kwargs = model_kwargs
         self.preselector_kwargs = preselector_kwargs
         self.config = config
+        self.kind = 'Assets'
 
     def prepare(self, returns):
         assets = returns.index
@@ -90,7 +96,9 @@ class AssetPreselector():
         inputs, outputs = self.prepare(returns=returns)
         selected_assets = self.preselection(inputs=inputs, outputs=outputs, **self.preselector_kwargs)
 
-        return selected_assets
+        returns_out = returns.loc[selected_assets]
+
+        return returns_out
 
 
 class DEA_AS(AssetPreselector):
@@ -147,3 +155,68 @@ class Ranking_AS(AssetPreselector):
             return efficient_assets
         else:
             raise ValueError('Unknown Ranking kind! Available are "Fixed" and "Quantile"')
+
+
+class ComponentsPreselector:
+
+    def __init__(self, preselector_kwargs=None):
+        self.loadings = None
+        self.preselector_kwargs = preselector_kwargs
+        self.kind = 'Components'
+
+    def preselection(self, returns, kind='standard', n_components=None, variance_explained=None, **kwargs):
+        if kind not in ['standard', 'sparse', 'robust']:
+            raise ValueError(f"Unknown preselection type - {kind}. Available - 'standard', 'sparse', 'robust'")
+        returns = returns.T
+        mean = returns.mean(axis=1)
+        print(type(returns))
+        if kind == 'standard':
+            model = PCA(n_components=n_components)
+            model.fit(returns)
+            self.loadings = model.components_
+            returns_new = model.transform(returns)
+
+            if variance_explained is not None:
+                var = model.explained_variance_ratio_.cumsum()
+                returns_new = returns_new[var <= variance_explained]
+        elif kind == 'sparse':
+            pass
+        elif kind == 'robust':
+            if not rpy2_imported:
+                raise ValueError(
+                    'Robust PCA preselector requires R installation, which was not found!')
+
+            # Check if additiveDEA package is available. Otherwise - attempt installing.
+            try:
+                rospca = rpackages.importr('rospca')
+            except:
+                print('Failed to import rospca R package. Trying to install.')
+                try:
+                    utils = rpackages.importr('utils')
+                    utils.chooseCRANmirror(ind=1)
+                    utils.install_packages('rospca')
+                    rospca = rpackages.importr('rospca')
+                except Exception as e:
+                    raise ValueError(
+                        f'Failed to install the additiveDEA R package. Exception - {e}. Please, make sure that there is R installed with additiveDEA package in it.')
+            pandas2ri.activate()
+            r_dataframe = pandas2ri.py2rpy_pandasdataframe(returns)
+            model = rospca.rospca(r_dataframe, n_components)
+            self.loadings = model['loadings']
+            returns_new = returns @ self.loadings
+        else:
+            raise ValueError(f'Unknown kind - {kind} for ComponentsPreselector. ')
+
+
+        return returns_new.T + mean
+
+    def reverse_transform(self, weights):
+        asset_weights = np.abs(weights @ self.loadings)
+
+        return asset_weights / asset_weights.sum()
+
+    def select(self, returns):
+        components_out = self.preselection(returns=returns, **self.preselector_kwargs)
+        plt.plot(components_out.T)
+        plt.show()
+        return components_out
