@@ -35,11 +35,11 @@ class StrategyConfigured:
     def list():
         l = ['MSG_Sharpe_ratio', 'MSG_Pearson_ratio', 'MSG_Omega_ratio', 'MSG_Stable_ratio',
              'MSG_Sharpe_ratio_cond', 'MSG_Sharpe_ratio_ranking', 'MSG_Sharpe_ratio_R1', 'MSG_Sharpe_ratio_R2',
-             'AGC_Sharpe_ratio', 'AGC_MVO']
+             'AGC_Sharpe_ratio', 'AGC_MVO', 'MSG_Sharpe_ratio_PCA', 'MSG_Stable_ratio_PCA', 'MSG_Pearson_ratio_PCA', 'MSG_Omega_ratio_PCA']
         return l
 
     def prepare_preselector(self):
-        if self.preselection:
+        if self.preselection and 'PCA' not in self.name:
             model = MarkovChainProcess
             metrics = [(cumulative_wealth, True, {'T': 50}),
                        (returns_sd, False, {}),
@@ -74,7 +74,10 @@ class StrategyConfigured:
                                          model_metrics=model_metrics,
                                          model_kwargs=model_kwargs,
                                          preselector_kwargs=preselector_kwargs)
-
+        elif self.preselection:
+            preselector_kwargs = {'kind': 'standard',
+                                  'variance_explained': 0.7}
+            preselector = ComponentsPreselector(preselector_kwargs=preselector_kwargs)
         else:
             preselector = None
 
@@ -85,7 +88,8 @@ class StrategyConfigured:
             model = MarkovChainProcess
 
             names = ['MSG_Sharpe_ratio', 'MSG_Pearson_ratio', 'MSG_Omega_ratio', 'MSG_Stable_ratio',
-                     'MSG_Sharpe_ratio_cond', 'MSG_Sharpe_ratio_ranking', 'MSG_Sharpe_ratio_R1', 'MSG_Sharpe_ratio_R2']
+                     'MSG_Sharpe_ratio_cond', 'MSG_Sharpe_ratio_ranking', 'MSG_Sharpe_ratio_R1', 'MSG_Sharpe_ratio_R2',
+                     'MSG_Sharpe_ratio_PCA', 'MSG_Pearson_ratio_PCA', 'MSG_Stable_ratio_PCA','MSG_Omega_ratio_PCA']
 
             metrics_prep = [('MSG_sharpe_ratio', True, {'T': self.T}),
                             ('MSG_corr_ratio', True, {'T': self.T}),
@@ -95,6 +99,10 @@ class StrategyConfigured:
                             ('MSG_sharpe_ratio', True, {'T': self.T}),
                             ('MSG_sharpe_ratio', True, {'T': self.T}),
                             ('MSG_sharpe_ratio', True, {'T': self.T}),
+                            ('MSG_sharpe_ratio', True, {'T': self.T}),
+                            ('MSG_corr_ratio', True, {'T': self.T}),
+                            ('MSG_stable_ratio', True, {'T': self.T}),
+                            ('MSG_omega_ratio', True, {'T': self.T}),
                             ]
 
             metrics_opt = dict(zip(names, metrics_prep))

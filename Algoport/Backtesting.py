@@ -116,6 +116,11 @@ class BackTest:
         weekly_performance['weights_turnover'] = weights_turnover
         weekly_performance['assets'] = strategy.assets
         weekly_performance['weights'] = strategy.weights
+        if len(strategy.component_weights) != 0:
+            try:
+                weekly_performance['component_weights'] = strategy.component_weights
+            except:
+                pass
         average_performance = self.calculate_metrics(performance=weekly_performance)
 
         self.performance = {'Weekly': weekly_performance,

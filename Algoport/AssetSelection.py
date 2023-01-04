@@ -165,11 +165,8 @@ class ComponentsPreselector:
         self.kind = 'Components'
 
     def preselection(self, returns, kind='standard', n_components=None, variance_explained=None, **kwargs):
-        if kind not in ['standard', 'sparse', 'robust']:
-            raise ValueError(f"Unknown preselection type - {kind}. Available - 'standard', 'sparse', 'robust'")
         returns = returns.T
-        mean = returns.mean(axis=1)
-        print(type(returns))
+        mean = np.array(returns.mean(axis=1))
         if kind == 'standard':
             model = PCA(n_components=n_components)
             model.fit(returns)
@@ -178,9 +175,9 @@ class ComponentsPreselector:
 
             if variance_explained is not None:
                 var = model.explained_variance_ratio_.cumsum()
-                returns_new = returns_new[var <= variance_explained]
-        elif kind == 'sparse':
-            pass
+                mask = np.argwhere((var >= variance_explained))[0,0]
+                returns_new = returns_new[:, 0:mask+1]
+                self.loadings = self.loadings[:, 0:mask+1].T
         elif kind == 'robust':
             if not rpy2_imported:
                 raise ValueError(
@@ -201,22 +198,25 @@ class ComponentsPreselector:
                         f'Failed to install the additiveDEA R package. Exception - {e}. Please, make sure that there is R installed with additiveDEA package in it.')
             pandas2ri.activate()
             r_dataframe = pandas2ri.py2rpy_pandasdataframe(returns)
-            model = rospca.rospca(r_dataframe, n_components)
-            self.loadings = model['loadings']
-            returns_new = returns @ self.loadings
+            model = rospca.rospca(r_dataframe, n_components, ndir=5000)
+            self.loadings = model.rx2('loadings').T
+            returns_new = model.rx2('scores')
         else:
             raise ValueError(f'Unknown kind - {kind} for ComponentsPreselector. ')
 
+        returns_new = returns_new.T + mean
+        returns_new[returns_new < 0] = 0
 
-        return returns_new.T + mean
+        return returns_new
 
     def reverse_transform(self, weights):
-        asset_weights = np.abs(weights @ self.loadings)
-
-        return asset_weights / asset_weights.sum()
+        asset_weights = weights @ self.loadings
+        asset_weights[asset_weights<0.001] = 0
+        asset_weights = asset_weights / asset_weights.sum()
+        asset_weights[asset_weights<0.001] = 0
+        asset_weights = asset_weights / asset_weights.sum()
+        return asset_weights
 
     def select(self, returns):
         components_out = self.preselection(returns=returns, **self.preselector_kwargs)
-        plt.plot(components_out.T)
-        plt.show()
         return components_out

@@ -23,6 +23,7 @@ class Strategy:
 
         self.assets = []
         self.weights = []
+        self.component_weights = []
         # Current weights at the moment of decision making.
         # Note that the vector has dimension of all the assets available currently for selection.
         # It is adjusted for the last realized returns.
@@ -87,9 +88,13 @@ class Strategy:
                 returns = returns.loc[assets]
 
             if self.optimizer is not None:
-                current_weights = self.weights_current.loc[returns.index]
+                if self.preselector is None or self.preselector.kind == 'Assets':
+                    current_weights = self.weights_current.loc[returns.index]
+                else:
+                    current_weights = None
                 weights = self.optimizer.optimize(returns=returns, current_weights=current_weights)
                 if self.preselector.kind == 'Components':
+                    self.component_weights.append(weights)
                     weights = self.preselector.reverse_transform(weights)
             else:
                 weights = np.ones(len(returns))
@@ -118,6 +123,7 @@ class Strategy:
             if self.optimizer is not None:
                 weights = self.optimizer.optimize(returns=returns)
                 if self.preselector.kind == 'Components':
+                    self.component_weights.append(weights)
                     weights = self.preselector.reverse_transform(weights)
             else:
                 weights = np.ones(len(returns))
