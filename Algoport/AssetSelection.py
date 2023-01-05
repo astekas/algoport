@@ -1,6 +1,7 @@
 ### A module containing the models for Asset Preselection ###
 import inspect
 
+from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -164,9 +165,10 @@ class ComponentsPreselector:
         self.preselector_kwargs = preselector_kwargs
         self.kind = 'Components'
 
-    def preselection(self, returns, kind='standard', n_components=None, variance_explained=None, **kwargs):
+    def preselection(self, returns, kind='standard', n_components=None, variance_explained=None, sparsity_alpha = 1, **kwargs):
         returns = returns.T
         mean = np.array(returns.mean(axis=1))
+        returns = StandardScaler().fit_transform(returns)
         if kind == 'standard':
             model = PCA(n_components=n_components)
             model.fit(returns)
@@ -177,7 +179,15 @@ class ComponentsPreselector:
                 var = model.explained_variance_ratio_.cumsum()
                 mask = np.argwhere((var >= variance_explained))[0,0]
                 returns_new = returns_new[:, 0:mask+1]
-                self.loadings = self.loadings[:, 0:mask+1].T
+                self.loadings = self.loadings[:, 0:mask+1]
+        elif kind == 'sparse':
+            model = SparsePCA(n_components=n_components, alpha=sparsity_alpha)
+            model.fit(returns)
+            self.loadings = model.components_
+            returns_new = model.transform(returns)
+
+            if variance_explained is not None:
+                warnings.warn('variance_explained argument has no impact on sparse components preselection!')
         elif kind == 'robust':
             if not rpy2_imported:
                 raise ValueError(
@@ -219,4 +229,6 @@ class ComponentsPreselector:
 
     def select(self, returns):
         components_out = self.preselection(returns=returns, **self.preselector_kwargs)
+        plt.plot(components_out.T)
+        plt.show()
         return components_out

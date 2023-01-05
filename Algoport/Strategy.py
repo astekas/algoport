@@ -23,7 +23,9 @@ class Strategy:
 
         self.assets = []
         self.weights = []
+        # Is only filled if ComponentPreselector is used
         self.component_weights = []
+        self.values = []
         # Current weights at the moment of decision making.
         # Note that the vector has dimension of all the assets available currently for selection.
         # It is adjusted for the last realized returns.
@@ -92,7 +94,8 @@ class Strategy:
                     current_weights = self.weights_current.loc[returns.index]
                 else:
                     current_weights = None
-                weights = self.optimizer.optimize(returns=returns, current_weights=current_weights)
+                weights, value = self.optimizer.optimize(returns=returns, current_weights=current_weights)
+                self.values.append(value)
                 if self.preselector.kind == 'Components':
                     self.component_weights.append(weights)
                     weights = self.preselector.reverse_transform(weights)
@@ -121,7 +124,8 @@ class Strategy:
             elif assets is not None:
                 returns = returns.loc[assets]
             if self.optimizer is not None:
-                weights = self.optimizer.optimize(returns=returns)
+                weights, value = self.optimizer.optimize(returns=returns)
+                self.values.append(value)
                 if self.preselector.kind == 'Components':
                     self.component_weights.append(weights)
                     weights = self.preselector.reverse_transform(weights)
@@ -151,7 +155,8 @@ class StrategySmoothed(Strategy):
 
             if self.optimizer is not None:
                 current_weights = self.weights_current.loc[returns.index]
-                weights = self.optimizer.optimize(returns=returns, current_weights=current_weights)
+                weights, value = self.optimizer.optimize(returns=returns, current_weights=current_weights)
+                self.values.append(value)
                 if self.preselector.kind == 'Components':
                     weights = self.preselector.reverse_transform(weights)
             else:

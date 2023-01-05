@@ -2,7 +2,8 @@
 from qpsolvers import solve_qp
 from pymoo.core.problem import ElementwiseProblem
 from pymoo.core.repair import Repair
-from pymoo.algorithms.moo.sms import SMSEMOA
+import pymoo.algorithms.moo.sms as pymoo_algs
+from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.optimize import minimize
 import inspect
 import numpy as np
@@ -16,15 +17,13 @@ from Algoport import Metrics
 
 # Meta-heuristics based optimization
 class PortfolioProblem(ElementwiseProblem):
-    def __init__(self, n_var, function, data, function_kwargs, **kwargs):
+    def __init__(self, n_var, function, data,  **kwargs):
         super().__init__(n_var=n_var, n_obj=1, xl=0.0, xu=1.0, **kwargs)
         self.function = function
         self.data = data
-        self.function_kwargs = function_kwargs
 
     def _evaluate(self, x, out, *args, **kwargs):
-        args = [self.data, self.function_kwargs]
-        out["F"] = -self.function(x, args)
+        out["F"] = -self.function(x, self.data)
 
 class PortfolioRepair(Repair):
 
@@ -134,21 +133,23 @@ class PortfolioOptimizer:
             val = None
         self.values.append(val)
         self.optimization_times.append(perf_counter() - start)
-        return res
+        return res, val
 
 class PyMOO(PortfolioOptimizer):
 
-    def optimization(self, returns, algorithm='SMSEMOA', n_gen_termination=10):
+    def optimization(self, returns, algorithm='SMSEMOA', n_gen_termination=10, pop_size=100):
         n_var = len(returns)
-        problem = PortfolioProblem(n_var=n_var, function=self.func, data=returns, function_kwargs=None)
-        algorithm = SMSEMOA(repair=PortfolioRepair(),
-                            termination=('n_gen', n_gen_termination))
+        problem = PortfolioProblem(n_var=n_var, function=self.func, data=returns)
+        algorithm = GA(pop_size=pop_size,
+                        repair=PortfolioRepair(),
+                        eliminate_duplicates=True)
         res = minimize(problem,
                        algorithm,
-                       verbose=False)
+                       termination=('n_gen', n_gen_termination),
+                       verbose=True)
         X = res.opt.get("X")[0]
         F = res.opt.get("F")[0]
-        print(X)
+        print(X, F)
         return X, F
 
 class MealPy(PortfolioOptimizer):
@@ -210,8 +211,7 @@ class SciPy(PortfolioOptimizer):
         res = sc_minimize(self.func, x0=init, args=[returns], bounds=bounds, method=algorithm, constraints=constraints)
         weights = res.x
         weights[weights<1e-3] = 0
-        print('Final weights - ', res.x)
-        #todo change
+
         return res.x, res.fun
 
 # Classical quadratic optimization.

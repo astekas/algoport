@@ -55,10 +55,11 @@ class BackTest:
         self.asset_turnover = None
         self.weight_turnover = None
 
-    def _filter_outliers(self, returns):
+    def _filter_outliers(self, returns, method='assets'):
         def filter(arr):
-            IQR = np.quantile(arr, 0.75) - np.quantile(arr, 0.25)
-            median = np.quantile(arr, 0.5)
+            q75 = np.quantile(arr, 0.75)
+            q25 = np.quantile(arr, 0.25)
+            IQR = q75 - q25
             out = arr.copy()
             if np.any(arr > median + 3 * IQR):
                 out[arr > np.quantile(arr, 0.99)] = np.quantile(arr, 0.99)

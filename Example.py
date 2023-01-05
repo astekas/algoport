@@ -1,6 +1,6 @@
 from Algoport.Strategy import *
 from Algoport.Markov import MarkovChainProcess
-from Algoport.PortfolioOptimization import SimplexOptimization
+from Algoport.PortfolioOptimization import *
 from Algoport.AssetSelection import *
 from Algoport.Backtesting import BackTest
 from Algoport.Metrics import cumulative_wealth
@@ -35,25 +35,37 @@ def parse(path):
 #                          preselector_kwargs={'kind': 'Fixed',
 #                                               'n_assets': 30})
 
-preselector = ComponentsPreselector(preselector_kwargs={'kind':'robust', 'n_components':3, 'variance_explained':None})
+preselector = ComponentsPreselector(preselector_kwargs={'kind':'sparse', 'n_components':30, 'variance_explained':None})
 
 # Initialize optimizer. Logic is similar to preselector, just note that only a single metric is supported at the moment,
 # so a single metric tuple should be passed to either metric or model_metric argument
-optimizer = SimplexOptimization(model=MarkovChainProcess,
-                              model_metric=('MSG_sharpe_ratio', True, {'T': 5}),
-                              model_kwargs={'init': {},
-                                            'fit': {'N': 9,
-                                                    'transaction_cost': 0,
-                                                    'unconditional_start': True
-                                                    }},
-                              optimizer_kwargs={"m": 10, "p": 1})
+
+# optimizer = SimplexOptimization(model=MarkovChainProcess,
+#                               model_metric=('MSG_sharpe_ratio', True, {'T': 5}),
+#                               model_kwargs={'init': {},
+#                                             'fit': {'N': 9,
+#                                                     'transaction_cost': 0,
+#                                                     'unconditional_start': True
+#                                                     }},
+#                               optimizer_kwargs={"m": 10, "p": 1})
+
+optimizer = PyMOO(model=MarkovChainProcess,
+                  model_metric=('MSG_sharpe_ratio', True, {'T': 5}),
+                  model_kwargs={'init': {},
+                                'fit': {'N': 9,
+                                        'transaction_cost': 0,
+                                        'unconditional_start': True
+                                        }},
+                  optimizer_kwargs={'algorithm':'GeneticAlgorithm', 'n_gen_termination':10})
+
+
 
 # Initialize the strategy by passing preselector, optimizer and regulation_kwargs, which are passed to the
 # customizable regulation function within strategy class. Regulation is being called on each time step except the first,
 # thus user can define the strategy in time.
-strategy = StrategySmoothed(preselector=preselector,
-                            optimizer=optimizer,
-                            regulation_kwargs={'redistribute_every': 5, 'smoothing_delta': 0.5})
+strategy = Strategy(preselector=preselector,
+                    optimizer=optimizer,
+                    regulation_kwargs={'redistribute_every': 5, 'maintain_weights': True})
 
 # Initialize the backtesting environment.
 # Requires strategy, testing period defined as period_start - period end. At the moment, dates should be strictly
@@ -70,9 +82,10 @@ strategy = StrategySmoothed(preselector=preselector,
 # Output path - path to folder where results are saved.
 test = BackTest(strategy=strategy,
                 period_start="2021-12-09",
-                period_end="2021-12-15",
+                period_end="2022-01-20",
                 train_periods=1825,
-                output_path='.\\Tests\\Test\\')
+                output_path='.\\Tests\\Test\\',
+                filter_outliers=True)
 
 # Run the test)
 test.run()
