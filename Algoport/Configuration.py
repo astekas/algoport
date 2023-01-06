@@ -35,7 +35,8 @@ class StrategyConfigured:
     def list():
         l = ['MSG_Sharpe_ratio', 'MSG_Pearson_ratio', 'MSG_Omega_ratio', 'MSG_Stable_ratio',
              'MSG_Sharpe_ratio_cond', 'MSG_Sharpe_ratio_ranking', 'MSG_Sharpe_ratio_R1', 'MSG_Sharpe_ratio_R2',
-             'AGC_Sharpe_ratio', 'AGC_MVO', 'MSG_Sharpe_ratio_NMF', 'MSG_Stable_ratio_NMF', 'MSG_Pearson_ratio_NMF', 'MSG_Omega_ratio_NMF']
+             'AGC_Sharpe_ratio', 'AGC_MVO', 'MSG_Sharpe_ratio_NMF', 'MSG_Stable_ratio_NMF', 'MSG_Pearson_ratio_NMF', 'MSG_Omega_ratio_NMF',
+             'MSG_Sharpe_ratio_GA', 'MSG_Pearson_ratio_GA', 'MSG_Stable_ratio_GA','MSG_Omega_ratio_GA']
         return l
 
     def prepare_preselector(self):
@@ -88,7 +89,8 @@ class StrategyConfigured:
 
             names = ['MSG_Sharpe_ratio', 'MSG_Pearson_ratio', 'MSG_Omega_ratio', 'MSG_Stable_ratio',
                      'MSG_Sharpe_ratio_cond', 'MSG_Sharpe_ratio_ranking', 'MSG_Sharpe_ratio_R1', 'MSG_Sharpe_ratio_R2',
-                     'MSG_Sharpe_ratio_NMF', 'MSG_Pearson_ratio_NMF', 'MSG_Stable_ratio_NMF','MSG_Omega_ratio_NMF']
+                     'MSG_Sharpe_ratio_NMF', 'MSG_Pearson_ratio_NMF', 'MSG_Stable_ratio_NMF','MSG_Omega_ratio_NMF',
+                     'MSG_Sharpe_ratio_GA', 'MSG_Pearson_ratio_GA', 'MSG_Stable_ratio_GA','MSG_Omega_ratio_GA']
 
             metrics_prep = [('MSG_sharpe_ratio', True, {'T': self.T}),
                             ('MSG_corr_ratio', True, {'T': self.T}),
@@ -98,6 +100,10 @@ class StrategyConfigured:
                             ('MSG_sharpe_ratio', True, {'T': self.T}),
                             ('MSG_sharpe_ratio', True, {'T': self.T}),
                             ('MSG_sharpe_ratio', True, {'T': self.T}),
+                            ('MSG_sharpe_ratio', True, {'T': self.T}),
+                            ('MSG_corr_ratio', True, {'T': self.T}),
+                            ('MSG_stable_ratio', True, {'T': self.T}),
+                            ('MSG_omega_ratio', True, {'T': self.T}),
                             ('MSG_sharpe_ratio', True, {'T': self.T}),
                             ('MSG_corr_ratio', True, {'T': self.T}),
                             ('MSG_stable_ratio', True, {'T': self.T}),
@@ -145,12 +151,18 @@ class StrategyConfigured:
         else:
             raise ValueError('Could not set up the optimizer! Strategy name missing MSG or AGC')
 
-        if 'MVO' not in self.name:
+        if 'MVO' not in self.name and 'GA' not in self.name:
             optimizer = SimplexOptimization(model=model,
                                             metric=metric,
                                             model_metric=model_metric,
                                             model_kwargs=model_kwargs,
                                             optimizer_kwargs={"m": 10, "p": 1})
+        elif 'GA' in self.name:
+            optimizer = PyMOO(model=model,
+                              metric=metric,
+                              model_metric=model_metric,
+                              model_kwargs=model_kwargs,
+                              optimizer_kwargs={'algorithm': 'GeneticAlgorithm', 'n_gen_termination': 20})
         else:
             optimizer = MVOptimization(model=model,
                                        metric=metric,

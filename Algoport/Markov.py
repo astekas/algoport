@@ -692,7 +692,7 @@ class MarkovChainProcess:
             return 1e20
         return num / den
 
-    def MSG_omega_ratio(self, T, thresh=1.05):
+    def MSG_omega_ratio(self, T, thresh=1.01):
         """
 
         :param T:
@@ -705,6 +705,7 @@ class MarkovChainProcess:
         try:
             alpha, beta, loc, scale = self.stable_params_est(wealth, emp_cdf).values()
         except:
+            warnings.warn('Stable parameters could not be estimated. Perhaps the Markov transition matrix is too sparse.')
             return 0
 
         thresh = (thresh * self.data.mean(axis=0).mean()) ** T

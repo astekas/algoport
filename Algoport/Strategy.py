@@ -94,8 +94,7 @@ class Strategy:
                     current_weights = self.weights_current.loc[returns.index]
                 else:
                     current_weights = None
-                weights, value = self.optimizer.optimize(returns=returns, current_weights=current_weights)
-                self.values.append(value)
+                weights = self.optimizer.optimize(returns=returns, current_weights=current_weights)
                 if self.preselector.kind == 'Components':
                     self.component_weights.append(weights)
                     weights = self.preselector.reverse_transform(weights)
@@ -124,8 +123,7 @@ class Strategy:
             elif assets is not None:
                 returns = returns.loc[assets]
             if self.optimizer is not None:
-                weights, value = self.optimizer.optimize(returns=returns)
-                self.values.append(value)
+                weights = self.optimizer.optimize(returns=returns)
                 if self.preselector.kind == 'Components':
                     self.component_weights.append(weights)
                     weights = self.preselector.reverse_transform(weights)
@@ -155,8 +153,7 @@ class StrategySmoothed(Strategy):
 
             if self.optimizer is not None:
                 current_weights = self.weights_current.loc[returns.index]
-                weights, value = self.optimizer.optimize(returns=returns, current_weights=current_weights)
-                self.values.append(value)
+                weights = self.optimizer.optimize(returns=returns, current_weights=current_weights)
                 if self.preselector.kind == 'Components':
                     weights = self.preselector.reverse_transform(weights)
             else:

@@ -23,7 +23,7 @@ class PortfolioProblem(ElementwiseProblem):
         self.data = data
 
     def _evaluate(self, x, out, *args, **kwargs):
-        out["F"] = -self.function(x, self.data)
+        out["F"] = self.function(x, self.data)
 
 class PortfolioRepair(Repair):
 
@@ -133,11 +133,12 @@ class PortfolioOptimizer:
             val = None
         self.values.append(val)
         self.optimization_times.append(perf_counter() - start)
-        return res, val
+        return res
 
 class PyMOO(PortfolioOptimizer):
 
     def optimization(self, returns, algorithm='SMSEMOA', n_gen_termination=10, pop_size=100):
+        #todo setup algorithm selection and configuration
         n_var = len(returns)
         problem = PortfolioProblem(n_var=n_var, function=self.func, data=returns)
         algorithm = GA(pop_size=pop_size,
@@ -146,7 +147,7 @@ class PyMOO(PortfolioOptimizer):
         res = minimize(problem,
                        algorithm,
                        termination=('n_gen', n_gen_termination),
-                       verbose=True)
+                       verbose=False)
         X = res.opt.get("X")[0]
         F = res.opt.get("F")[0]
         print(X, F)

@@ -19,7 +19,8 @@ class BackTest:
                  preselection_profile=None,
                  view='SNP500',
                  frequency='daily',
-                 filter_outliers=False):
+                 filter_outliers=False,
+                 plot=True):
 
         self.strategy = strategy
         self.period_start = period_start
@@ -30,6 +31,7 @@ class BackTest:
         self.filter_outliers = filter_outliers
         self.output_path = output_path
         self.preselection_profile = preselection_profile
+        self.plot = plot
         if self.preselection_profile is not None:
             self.preselection_profile = pd.Series(self.preselection_profile)
 
@@ -117,26 +119,36 @@ class BackTest:
         weekly_performance['weights_turnover'] = weights_turnover
         weekly_performance['assets'] = strategy.assets
         weekly_performance['weights'] = strategy.weights
+
+        preselection = {}
+        optimization = {}
         if len(strategy.component_weights) != 0:
             try:
-                weekly_performance['component_weights'] = strategy.component_weights
+                preselection['component_weights'] = strategy.component_weights
             except:
                 pass
-        if len(strategy.values) != 0:
+        if len(strategy.optimizer.values) != 0:
             try:
-                weekly_performance['function_values'] = strategy.values
+                optimization['function_values'] = strategy.optimizer.values
+            except:
+                pass
+        if len(strategy.optimizer.optimization_times) != 0:
+            try:
+                optimization['optimization_times'] = strategy.optimizer.optimization_times
             except:
                 pass
         average_performance = self.calculate_metrics(performance=weekly_performance)
 
         self.performance = {'Weekly': weekly_performance,
-                            'Average': average_performance}
+                            'Average': average_performance,
+                            'Optimization': optimization,
+                            'Preselection': preselection}
 
         if save_results:
             self.save_results()
 
 
-    def save_results(self):
+    def save_results(self, plot=True):
         '''
         Save the results of strategy backtesting in the folder with strategy name at self.output_path
         :return: None
@@ -154,15 +166,16 @@ class BackTest:
             pickle.dump(results, f)
         # Save the strategy config into the same folder
         # Make and save the plots
-        df = results['Weekly']
-        strategy_name = path.strip('\\').split('\\')[-1]
-        self.plot_portfolio_returns(portfolio_returns=df['return'], name=strategy_name, save=True, output_path=path)
-        self.plot_cumulative_wealth(portfolio_wealth=df['wealth'], name=strategy_name, save=True,
-                                    output_path=path)
-        self.plot_asset_turnover(asset_turnover=df['asset_turnover'], name=strategy_name, save=True,
-                                    output_path=path)
-        self.plot_weight_turnover(weight_turnover=df['weights_turnover'], name=strategy_name, save=True,
-                                    output_path=path)
+        if self.plot:
+            df = results['Weekly']
+            strategy_name = path.strip('\\').split('\\')[-1]
+            self.plot_portfolio_returns(portfolio_returns=df['return'], name=strategy_name, save=True, output_path=path)
+            self.plot_cumulative_wealth(portfolio_wealth=df['wealth'], name=strategy_name, save=True,
+                                        output_path=path)
+            self.plot_asset_turnover(asset_turnover=df['asset_turnover'], name=strategy_name, save=True,
+                                        output_path=path)
+            self.plot_weight_turnover(weight_turnover=df['weights_turnover'], name=strategy_name, save=True,
+                                        output_path=path)
 
     def calculate_portfolio_return(self, strategy):
         """

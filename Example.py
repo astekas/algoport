@@ -40,23 +40,23 @@ preselector = NMFPreselector(preselector_kwargs={})
 # Initialize optimizer. Logic is similar to preselector, just note that only a single metric is supported at the moment,
 # so a single metric tuple should be passed to either metric or model_metric argument
 
-optimizer = SimplexOptimization(model=MarkovChainProcess,
-                              model_metric=('MSG_sharpe_ratio', True, {'T': 5}),
-                              model_kwargs={'init': {},
-                                            'fit': {'N': 9,
-                                                    'transaction_cost': 0,
-                                                    'unconditional_start': True
-                                                    }},
-                              optimizer_kwargs={"m": 10, "p": 1})
+# optimizer = SimplexOptimization(model=MarkovChainProcess,
+#                               model_metric=('MSG_sharpe_ratio', True, {'T': 5}),
+#                               model_kwargs={'init': {},
+#                                             'fit': {'N': 9,
+#                                                     'transaction_cost': 0,
+#                                                     'unconditional_start': True
+#                                                     }},
+#                               optimizer_kwargs={"m": 10, "p": 1})
 
-# optimizer = PyMOO(model=MarkovChainProcess,
-#                   model_metric=('MSG_sharpe_ratio', True, {'T': 5}),
-#                   model_kwargs={'init': {},
-#                                 'fit': {'N': 9,
-#                                         'transaction_cost': 0,
-#                                         'unconditional_start': True
-#                                         }},
-#                   optimizer_kwargs={'algorithm':'GeneticAlgorithm', 'n_gen_termination':10})
+optimizer = PyMOO(model=MarkovChainProcess,
+                  model_metric=('MSG_omega_ratio', True, {'T': 5}),
+                  model_kwargs={'init': {},
+                                'fit': {'N': 9,
+                                        'transaction_cost': 0,
+                                        'unconditional_start': True
+                                        }},
+                  optimizer_kwargs={'algorithm':'GeneticAlgorithm', 'n_gen_termination':2})
 
 
 

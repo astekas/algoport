@@ -8,7 +8,7 @@ def parse(path):
     df = pickle.load(f)
     return df
 
-to_test = ['MSG_Omega_ratio_NMF', 'MSG_Sharpe_ratio_NMF', 'MSG_Stable_ratio_NMF']
+to_test = ['MSG_Sharpe_ratio_GA', 'MSG_Stable_ratio_GA','MSG_Omega_ratio_GA', 'MSG_Sharpe_ratio', 'MSG_Omega_ratio', 'MSG_Stable_ratio']
 
 for name in to_test:
     strategy = StrategyConfigured(name=name, T=5, preselection=True).fetch()
