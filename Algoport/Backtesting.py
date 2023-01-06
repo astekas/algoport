@@ -60,11 +60,11 @@ class BackTest:
             q75 = np.quantile(arr, 0.75)
             q25 = np.quantile(arr, 0.25)
             IQR = q75 - q25
+            thr_u = q75 + 3 * IQR
+            thr_l = q25 - 3 * IQR
             out = arr.copy()
-            if np.any(arr > median + 3 * IQR):
-                out[arr > np.quantile(arr, 0.99)] = np.quantile(arr, 0.99)
-            if np.any(arr < median - 3 * IQR):
-                out[arr < np.quantile(arr, 0.01)] = np.quantile(arr, 0.01)
+            out[arr > thr_u] = thr_u
+            out[arr < thr_l] = thr_l
             return out
 
         returns = returns.apply(lambda row: filter(row), axis=1)
@@ -120,6 +120,11 @@ class BackTest:
         if len(strategy.component_weights) != 0:
             try:
                 weekly_performance['component_weights'] = strategy.component_weights
+            except:
+                pass
+        if len(strategy.values) != 0:
+            try:
+                weekly_performance['function_values'] = strategy.values
             except:
                 pass
         average_performance = self.calculate_metrics(performance=weekly_performance)

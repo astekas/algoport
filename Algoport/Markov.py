@@ -219,7 +219,14 @@ class MarkovChainProcess:
         if self.dim == 1:
             probabilities = self.compute_wealth_distribution(steps=T).squeeze()
             wealths = self.compute_wealth(steps=T).squeeze()
-            return probabilities @ wealths
+            if len(wealths.shape) == 2:
+                expected_wealth = []
+                for i in range(wealths.shape[0]):
+                    expected_wealth.append(probabilities[i] @ wealths[i])
+
+                return np.array(expected_wealth)
+            else:
+                return probabilities @ wealths
         elif self.dim == 2:
             probabilities = self.compute_wealth_distribution(steps=T)
             probabilities = np.stack((probabilities, probabilities), axis=2)
@@ -686,7 +693,7 @@ class MarkovChainProcess:
             return 1e20
         return num / den
 
-    def MSG_omega_ratio(self, T, thresh=1.1):
+    def MSG_omega_ratio(self, T, thresh=1.05):
         """
 
         :param T:
@@ -701,8 +708,7 @@ class MarkovChainProcess:
         except:
             return 0
 
-        if loc > thresh:
-            thresh = (loc + thresh) / 2
+        thresh = (thresh * self.data.mean(axis=0).mean()) ** T
 
         # The check is done on import. Use C version if managed to import the dll or Python if not.
         if cdf_2_imported:

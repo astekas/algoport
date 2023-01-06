@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import warnings
-from sklearn.decomposition import PCA, SparsePCA
+from sklearn.decomposition import PCA, SparsePCA, NMF
 
 from Algoport import Metrics
 
@@ -159,7 +159,6 @@ class Ranking_AS(AssetPreselector):
 
 
 class ComponentsPreselector:
-
     def __init__(self, preselector_kwargs=None):
         self.loadings = None
         self.preselector_kwargs = preselector_kwargs
@@ -229,6 +228,24 @@ class ComponentsPreselector:
 
     def select(self, returns):
         components_out = self.preselection(returns=returns, **self.preselector_kwargs)
-        plt.plot(components_out.T)
-        plt.show()
+        # plt.plot(components_out.T)
+        # plt.show()
         return components_out
+
+class NMFPreselector(ComponentsPreselector):
+
+    def preselection(self, returns, n_components=30, sparsity=0.5, **kwargs):
+        returns = returns.T
+        model = NMF(n_components=n_components, alpha_H=sparsity, max_iter=400)
+        model.fit(returns)
+        H = model.components_
+        H = H[H.sum(axis=1)>0]
+        self.loadings = (H.T / H.sum(axis=1)).T
+        returns_new = (self.loadings @ returns.T)
+
+        return np.array(returns_new)
+
+    def reverse_transform(self, weights):
+        asset_weights = weights @ self.loadings
+        asset_weights = asset_weights / asset_weights.sum()
+        return asset_weights
