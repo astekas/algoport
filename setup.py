@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='algoport',
-    version='0.1.1',
+    version='0.1.2',
     description='Algorithmic portfolio management framework',
     url='https://github.com/astekas/algoport.git',
     author='Anton Sauchanka',
