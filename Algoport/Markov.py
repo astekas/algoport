@@ -132,8 +132,7 @@ class MarkovChainProcess:
                                                                   counts.sum(axis=1))
         else:
             self.unconditional = False
-            self.unconditional_returns_prob = self.transition_matrix[:, self.last_state, :]
-            self.unconditional_returns_prob = self.unconditional_returns_prob.reshape((self.unconditional_returns_prob.shape[0], self.unconditional_returns_prob.shape[2]))
+            self.unconditional_returns_prob = self.transition_matrix[np.arange(len(self.data)), self.last_state, :]
 
     def fit_bi(self, arr1, arr2, N, M, weights=None, unconditional_start=True):
         """

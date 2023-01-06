@@ -1,5 +1,6 @@
 import pandas as pd
 from pkg_resources import resource_filename
+import numpy as np
 
 data_path = resource_filename('Algoport', 'Data/')
 
@@ -16,8 +17,8 @@ class Dataset:
         df = pd.read_parquet(data_path + "SNP500.parquet")
         df = df.pivot_table(index='Symbol', columns='Date', values='Close')
         df = df.loc[:, start:end]
-        df = df.rolling(2, axis=1).apply(lambda x: x.iloc[1] / x.iloc[0]).iloc[:, 1:]
-        return df
+        df.iloc[:, 1:] = np.array(df.iloc[:, 1:]) / np.array(df.iloc[:, :-1])
+        return df.iloc[:, 1:]
 
     def fetch(self, start, end):
         return self.__getattribute__(self.name)(start, end)
