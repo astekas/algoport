@@ -725,12 +725,13 @@ class MarkovChainProcess:
         """
         wealth = np.flip(self.compute_wealth(steps=T)).squeeze()
         emp_pdf = np.flip(self.compute_wealth_distribution(steps=T).squeeze())
+        exp_wealth = wealth @ emp_pdf
         emp_cdf = emp_pdf.cumsum()
         try:
             alpha, beta, loc, scale = self.stable_params_est(wealth, emp_cdf).values()
         except:
             return 0
-        CVaR = self.CVaR(alpha, beta, loc, scale)
+        CVaR = self.CVaR(alpha, beta, loc-exp_wealth, scale)
         ratio = loc / (1 + CVaR)
         return ratio
 

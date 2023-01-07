@@ -34,9 +34,6 @@ def parse(path):
 #                                                 }},
 #                          preselector_kwargs={'kind': 'Fixed',
 #                                               'n_assets': 30})
-
-# preselector = NMFPreselector(preselector_kwargs={})
-
 T = 5
 model = MarkovChainProcess
 metrics = [(cumulative_wealth, True, {'T': 50}),
@@ -46,29 +43,29 @@ metrics = [(cumulative_wealth, True, {'T': 50}),
            (mean_return, True, {})
            ]
 model_metrics = [('MSG_wealth_mean', True, {'T': T}),
-         ('MSG_time_to_lose', True, {'T': T}),
-         ('MSG_square_root_utility', True, {'T': T}),
-         ('MSG_stable_location', True, {'T': T}),
-         ('MSG_wealth_sd', False, {'T': T}),
-         ('MSG_time_to_gain', False, {'T': T}),
-         ('MSG_CVaR_log_wealth', False, {'T': T}),
-         ]
+                 ('MSG_time_to_lose', True, {'T': T}),
+                 ('MSG_square_root_utility', True, {'T': T}),
+                 ('MSG_stable_location', True, {'T': T}),
+                 ('MSG_wealth_sd', False, {'T': T}),
+                 ('MSG_time_to_gain', False, {'T': T}),
+                 ('MSG_CVaR_log_wealth', False, {'T': T}),
+                 ]
 model_kwargs = {'init': {},
-        'fit': {'N': 9,
-                }}
-preselector_kwargs = {}
+                'fit': {'N': 9,
+                        }}
 
 preselector = DEA_AS(model=model,
                      metrics=metrics,
                      model_metrics=model_metrics,
                      model_kwargs=model_kwargs,
-                     preselector_kwargs=preselector_kwargs)
+                     preselector_kwargs={})
+# preselector = NMFPreselector(preselector_kwargs={})
 
 # Initialize optimizer. Logic is similar to preselector, just note that only a single metric is supported at the moment,
 # so a single metric tuple should be passed to either metric or model_metric argument
 
 optimizer = SimplexOptimization(model=MarkovChainProcess,
-                              model_metric=('MSG_stable_ratio', True, {'T': 5}),
+                              model_metric=('MSG_omega_ratio', True, {'T': 5}),
                               model_kwargs={'init': {},
                                             'fit': {'N': 9,
                                                     'transaction_cost': 0.1,
@@ -111,7 +108,7 @@ test = BackTest(strategy=strategy,
                 period_start="2021-12-09",
                 period_end="2022-12-09",
                 train_periods=1825,
-                output_path='.\\Tests\\Recession\\MSG_Stable_ratio_R1',
+                output_path='.\\Tests\\Growth\\MSG_Omega_ratio_R1',
                 filter_outliers=True)
 
 # Run the test)
@@ -124,7 +121,7 @@ test = BackTest(strategy=strategy,
                 period_start="2016-01-01",
                 period_end="2017-01-01",
                 train_periods=1825,
-                output_path='.\\Tests\\Growth\\MSG_Stable_ratio_R1',
+                output_path='.\\Tests\\Growth\\MSG_Omega_ratio_R1',
                 filter_outliers=True)
 
 test.run()
