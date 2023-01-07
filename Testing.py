@@ -8,7 +8,7 @@ def parse(path):
     df = pickle.load(f)
     return df
 
-to_test = ['MSG_Sharpe_ratio_GA', 'MSG_Stable_ratio_GA','MSG_Omega_ratio_GA', 'MSG_Sharpe_ratio', 'MSG_Omega_ratio', 'MSG_Stable_ratio']
+to_test = ['MSG_Sharpe_ratio_GA', 'MSG_Stable_ratio_GA',  'MSG_Sharpe_ratio', 'MSG_Stable_ratio']
 
 for name in to_test:
     strategy = StrategyConfigured(name=name, T=5, preselection=True).fetch()
@@ -18,7 +18,8 @@ for name in to_test:
                     period_start="2021-12-09",
                     period_end="2022-12-09",
                     train_periods=1825,
-                    output_path=f'.\\Tests\\Recession\\{name}_20\\')
+                    output_path=f'.\\Tests\\Recession\\{name}_new\\',
+                    filter_outliers=True)
 
     # Run the test)
     test.run()
@@ -30,6 +31,7 @@ for name in to_test:
                     period_start="2016-01-01",
                     period_end="2017-01-01",
                     train_periods=1825,
-                    output_path=f'.\\Tests\\Growth\\{name}_20')
+                    output_path=f'.\\Tests\\Growth\\{name}_new',
+                    filter_outliers=True)
 
     test.run()

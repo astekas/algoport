@@ -122,21 +122,23 @@ class BackTest:
 
         preselection = {}
         optimization = {}
-        if len(strategy.component_weights) != 0:
-            try:
-                preselection['component_weights'] = strategy.component_weights
-            except:
-                pass
-        if len(strategy.optimizer.values) != 0:
-            try:
-                optimization['function_values'] = strategy.optimizer.values
-            except:
-                pass
-        if len(strategy.optimizer.optimization_times) != 0:
-            try:
-                optimization['optimization_times'] = strategy.optimizer.optimization_times
-            except:
-                pass
+        if strategy.preselector is not None:
+            if len(strategy.component_weights) != 0:
+                try:
+                    preselection['component_weights'] = strategy.component_weights
+                except:
+                    pass
+        if strategy.optimizer is not None:
+            if len(strategy.optimizer.values) != 0:
+                try:
+                    optimization['function_values'] = strategy.optimizer.values
+                except:
+                    pass
+            if len(strategy.optimizer.optimization_times) != 0:
+                try:
+                    optimization['optimization_times'] = strategy.optimizer.optimization_times
+                except:
+                    pass
         average_performance = self.calculate_metrics(performance=weekly_performance)
 
         self.performance = {'Weekly': weekly_performance,

@@ -95,12 +95,13 @@ class Strategy:
                 else:
                     current_weights = None
                 weights = self.optimizer.optimize(returns=returns, current_weights=current_weights)
-                if self.preselector.kind == 'Components':
-                    self.component_weights.append(weights)
-                    weights = self.preselector.reverse_transform(weights)
             else:
                 weights = np.ones(len(returns))
                 weights = weights / weights.sum()
+
+            if self.preselector is not None and self.preselector.kind == 'Components':
+                self.component_weights.append(weights)
+                weights = self.preselector.reverse_transform(weights)
             self.assets.append(assets)
             self.weights.append(weights)
         else:
@@ -124,12 +125,13 @@ class Strategy:
                 returns = returns.loc[assets]
             if self.optimizer is not None:
                 weights = self.optimizer.optimize(returns=returns)
-                if self.preselector.kind == 'Components':
-                    self.component_weights.append(weights)
-                    weights = self.preselector.reverse_transform(weights)
             else:
                 weights = np.ones(len(returns))
                 weights = weights / weights.sum()
+
+            if self.preselector is not None and self.preselector.kind == 'Components':
+                self.component_weights.append(weights)
+                weights = self.preselector.reverse_transform(weights)
             self.assets.append(assets)
             self.weights.append(weights)
         else:
@@ -154,12 +156,12 @@ class StrategySmoothed(Strategy):
             if self.optimizer is not None:
                 current_weights = self.weights_current.loc[returns.index]
                 weights = self.optimizer.optimize(returns=returns, current_weights=current_weights)
-                if self.preselector.kind == 'Components':
-                    weights = self.preselector.reverse_transform(weights)
             else:
                 weights = np.ones(len(returns))
                 weights = weights / weights.sum()
-
+            if self.preselector is not None and self.preselector.kind == 'Components':
+                self.component_weights.append(weights)
+                weights = self.preselector.reverse_transform(weights)
             weights_current = self.weights_current
             weights_full = weights_current.copy()
             weights_full[:] = np.zeros(len(weights_full))

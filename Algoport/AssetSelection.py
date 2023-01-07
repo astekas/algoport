@@ -236,7 +236,7 @@ class NMFPreselector(ComponentsPreselector):
 
     def preselection(self, returns, n_components=30, sparsity=0.5, **kwargs):
         returns = returns.T
-        model = NMF(n_components=n_components, alpha_H=sparsity, max_iter=400)
+        model = NMF(n_components=n_components, alpha_H=sparsity, max_iter=1000)
         model.fit(returns)
         H = model.components_
         H = H[H.sum(axis=1)>0]
